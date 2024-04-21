@@ -30,6 +30,7 @@ def trends():
 def sentiments():
     query = request.args.get('query')
     if query:
+        query = query.replace("%20", " ")
         # Get tweets from the past 24 hours
         one_day_ago = datetime.now(timezone.utc) - timedelta(hours=8)
         start_time = one_day_ago.isoformat(timespec='milliseconds').replace('+00:00', '') + "Z"
@@ -43,7 +44,7 @@ def sentiments():
         qualities, prompt = asyncio.run(tweets_qualities(tweets))
         print(qualities)
         tries = 0
-        while len(qualities) != 3:
+        while len(qualities) != 3 or qualities == ['price', 'comfort', 'peaceful']:
             if tries == 3:
                 return jsonify({
                     'status': 'error',
