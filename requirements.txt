@@ -1,6 +1,7 @@
 flask[async]
 tweepy
 xai-sdk
+asyncio
 configparser
 requests
 flask_cors
