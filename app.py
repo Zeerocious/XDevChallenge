@@ -2,10 +2,8 @@
 import configparser
 import requests
 import base64
-from flask import Flask
-
-
-app = Flask(__name__)
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 # Read Twitter API credentials from a config file and Initialize Tweepy
 def init():
@@ -64,7 +62,7 @@ def search_tweets(bearer_token, query, max_results=10, start_time=None):
     response =  requests.get(search_url, headers=headers, params=params)
 
     if response.status_code == 200:
-        return response.json()
+        return jsonify(response)
     else:
         raise Exception("Failed to search tweets")
 
@@ -83,10 +81,27 @@ def search_tweets(bearer_token, query, max_results=10, start_time=None):
 
 
 bearer_token= init()
-@app.route('/')
-def hello():
-    trends = trend_tweets(26062, bearer_token)
-    return trends
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/', method = ['GET'])
+def welcome():
+    return 'Welcome to Twitter API!'
+
+@app.route('/api/trends', methods=['GET'])
+def trends():
+    query = request.args.get('query')
+    if query:
+        
+        trends = trend_tweets(query, bearer_token)
+        return trends
+    else:
+        return jsonify({
+            'status': 'error',
+            'message': 'Query parameter "q" is required.'
+        }), 400  # HTTP status code 400 (Bad Request)
+
     
 # Run the main function when this script is executed directly
 if __name__ == "__main__":

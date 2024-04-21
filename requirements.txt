@@ -3,3 +3,4 @@ tweepy
 xai-sdk
 configparser
 requests
+flask_cors
