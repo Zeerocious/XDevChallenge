@@ -35,12 +35,13 @@ def sentiments():
         start_time = one_day_ago.isoformat(timespec='milliseconds').replace('+00:00', '') + "Z"
         
         # Call the search_tweets function to get tweets and put them in a list
-        search_results = search_tweets(bearer_token, query, max_results=50, start_time=start_time)
+        search_results = search_tweets(bearer_token, query, max_results=10, start_time=start_time)
         tweets = []
         for tweet in search_results["data"]:
             tweets.append(tweet["text"])
         
-        qualities, prompt = asyncio.run(tweets_qualities(query))
+        qualities, prompt = asyncio.run(tweets_qualities(tweets))
+        print(qualities)
         tries = 0
         while len(qualities) != 3:
             if tries == 3:
@@ -48,7 +49,7 @@ def sentiments():
                     'status': 'error',
                     'message': 'Grok AI is dumb and failed the quality prompt 3 times. Please try again.'
                 }), 400
-            qualities, prompt = tweets_qualities(bearer_token, query, sampler)
+            qualities, prompt = asyncio.run(tweets_qualities(tweets))
             tries += 1
         tries = 0
         while True and tries < 3:

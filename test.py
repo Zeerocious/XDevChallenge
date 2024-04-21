@@ -29,14 +29,6 @@ tweets = []
 for tweet in search_results["data"]:
     tweets.append(tweet["text"])
     
-async def run_tweets_qualities():
-    qualities, prompt =  await tweets_qualities(tweets) 
-    return qualities, prompt
-
 qualities, prompt = asyncio.run(tweets_qualities(tweets))
-
-async def run_summarize_tweets():
-    qualities, prompt =  await summarize_tweets(tweets) 
-    return qualities, prompt
 
 asyncio.run(summarize_tweets(prompt))

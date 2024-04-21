@@ -59,7 +59,7 @@ Assistant: Understood! Please provide the list of tweets as a list of strings.""
         temperature=0.5,
         nucleus_p=0.95):
         response = response + token.token_str
-    prompt = prompt + response
+    prompt = prompt + response + "\n"
     qualities = response.split(",")
     return qualities, prompt
 
@@ -74,7 +74,7 @@ Human: Based on the qualities you've given, create three summaries of the same s
 Please format your answer as a valid JSON. For eg. if your qualities are (price, comfort, peaceful) your output should be.
 
 {
-    "data": [
+    "info": [
         {
             "quality": "price",
             "summary": "An opinionated summary of the tweets that express the price"
