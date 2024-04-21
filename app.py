@@ -26,44 +26,50 @@ def trends():
             'message': 'Query parameter "q" is required.'
         }), 400  # HTTP status code 400 (Bad Request)
 
-@app.route('/api/search', methods=['GET'])
-def search():
+@app.route('/api/sentiments', methods=['GET'])
+def sentiments():
     query = request.args.get('query')
     if query:
+        # Get tweets from the past 24 hours
         one_day_ago = datetime.now(timezone.utc) - timedelta(hours=8)
         start_time = one_day_ago.isoformat(timespec='milliseconds').replace('+00:00', '') + "Z"
         
+        # Call the search_tweets function to get tweets and put them in a list
         search_results = search_tweets(bearer_token, query, max_results=50, start_time=start_time)
-        return search_results
+        tweets = []
+        for tweet in search_results["data"]:
+            tweets.append(tweet["text"])
+        
+        qualities, prompt = asyncio.run(tweets_qualities(query))
+        tries = 0
+        while len(qualities) != 3:
+            if tries == 3:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Grok AI is dumb and failed the quality prompt 3 times. Please try again.'
+                }), 400
+            qualities, prompt = tweets_qualities(bearer_token, query, sampler)
+            tries += 1
+        tries = 0
+        while True and tries < 3:
+            try:
+                summary_obj = asyncio.run(summarize_tweets(prompt))
+                break
+            except:
+                tries +=1
+        if tries == 3:
+            return jsonify({
+                'status': 'error',
+                'message': 'Grok AI is dumb and failed the summary prompt 3 times. Please try again.'
+            }), 400
+        return summary_obj
+        
     else:
         return jsonify({
             'status': 'error',
             'message': 'Query parameter "q" is required.'
         }), 400
     
-@app.route('/api/summarize', methods=['POST'])
-def summarize():
-    query = request.json.get('query')
-    if query:
-        qualities = tweets_qualities(bearer_token, query, sampler)
-        while len(qualities) != 3:
-            qualities = tweets_qualities(bearer_token, query, sampler)
-            return jsonify({
-                'status': 'error',
-                'message': 'Grok AI is dumb and failed the prompt 3 times. Please try again.'
-            }), 400
-            
-        
-        quality_obj = {}
-        for quality in summary:
-            quality_obj[quality] = quality
-        return jsonify(quality_obj)
-    else:
-        return jsonify({
-            'status': 'error',
-            'message': 'Query parameter "q" is required.'
-        }), 400
-
 # Run the main function when this script is executed directly
 if __name__ == "__main__":
     app.run(debug=True)

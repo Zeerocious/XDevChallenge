@@ -33,7 +33,7 @@ async def run_tweets_qualities():
     qualities, prompt =  await tweets_qualities(tweets) 
     return qualities, prompt
 
-qualities, prompt = asyncio.run(run_tweets_qualities())
+qualities, prompt = asyncio.run(tweets_qualities(tweets))
 
 async def run_summarize_tweets():
     qualities, prompt =  await summarize_tweets(tweets) 

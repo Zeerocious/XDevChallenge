@@ -69,7 +69,7 @@ async def summarize_tweets(prompt):
     sampler = client.sampler
 
     prompt = prompt + """\
-Human: Based on the qualities you've given, create three summaries of the same set of tweets and what they expression about those qualities.
+Human: Based on the qualities you've given, create three summaries of the same set of tweets on people's sentiments about those qualities.
 
 Please format your answer as a valid JSON. For eg. if your qualities are (price, comfort, peaceful) your output should be.
 
@@ -77,15 +77,15 @@ Please format your answer as a valid JSON. For eg. if your qualities are (price,
     "data": [
         {
             "quality": "price",
-            "summary": "A summary of the tweets that express the price"
+            "summary": "An opinionated summary of the tweets that express the price"
         },
         {
             "quality": "comfort",
-            "summary": "A summary of the tweets that express the comfort"
+            "summary": "A opinionated summary of the tweets that express the comfort"
         },
         {
             "quality": "peaceful",
-            "summary": "A summary of the tweets that express the peaceful"
+            "summary": "A opinionated summary of the tweets that express the peaceful"
         }
     ]
 }
@@ -96,7 +96,7 @@ Assistant: Understood! Here's the valid JSON and nothing else: \n {\n"""
     response = "{\n"
     async for token in sampler.sample(
         prompt=prompt,
-        max_len=512,
+        max_len=1024,
         stop_tokens=["<|separator|>"],
         temperature=0.5,
         nucleus_p=0.95):
