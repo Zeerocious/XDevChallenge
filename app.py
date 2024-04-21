@@ -1,7 +1,11 @@
-import tweepy
+
 import configparser
 import requests
 import base64
+from flask import Flask
+
+
+app = Flask(__name__)
 
 # Read Twitter API credentials from a config file and Initialize Tweepy
 def init():
@@ -48,22 +52,42 @@ def trend_tweets(woeid, bearer_token):
         raise Exception("Failed to search tweets")
     
 # Search tweets based on parameters
-def search_tweets(api, query, geocode, lang, result_type, count):
-    return
+def search_tweets(bearer_token, query, max_results=10, start_time=None):
+    search_url = "https://api.twitter.com/2/tweets/search/recent"
+    headers = {
+        "Authorization" : f"Bearer {bearer_token}"
+    }
+    params = {
+        "query": params,
+        "max_results": 10
+    }
+    response =  requests.get(search_url, headers=headers, params=params)
 
-def main():
-    # Load Twitter API credentials. Return the Bearer_token
-    bearer_token= init()
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception("Failed to search tweets")
+
+# def main():
+#     # Load Twitter API credentials. Return the Bearer_token
+#     bearer_token= init()
     
-    # Fetch trending tweets
+#     # Fetch trending tweets
+#     trends = trend_tweets(26062, bearer_token)
+
+#     # Display fetched tweets
+#     for trend in trends["data"]:
+#         trend_name = trend["trend_name"]
+#         tweet_count = trend["tweet_count"] if "tweet_count" in trend else 0
+#         print(f"Trend: {trend_name} | Tweet Count: {tweet_count}\n")
+
+
+bearer_token= init()
+@app.route('/')
+def hello():
     trends = trend_tweets(26062, bearer_token)
-
-    # Display fetched tweets
-    for trend in trends["data"]:
-        trend_name = trend["trend_name"]
-        tweet_count = trend["tweet_count"] if "tweet_count" in trend else 0
-        print(f"Trend: {trend_name} | Tweet Count: {tweet_count}\n")
-
+    return trends
+    
 # Run the main function when this script is executed directly
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
