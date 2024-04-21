@@ -36,15 +36,15 @@ def sentiments():
         start_time = one_day_ago.isoformat(timespec='milliseconds').replace('+00:00', '') + "Z"
         
         # Call the search_tweets function to get tweets and put them in a list
-        search_results = search_tweets(bearer_token, query, max_results=10, start_time=start_time)
+        search_results = search_tweets(bearer_token, query, max_results=20, start_time=start_time)
         tweets = []
         for tweet in search_results["data"]:
             tweets.append(tweet["text"])
         
         qualities, prompt = asyncio.run(tweets_qualities(tweets))
-        print(qualities)
         tries = 0
         while len(qualities) != 3 or qualities == ['price', 'comfort', 'peaceful']:
+            print("Printing qualities: ", qualities)
             if tries == 3:
                 return jsonify({
                     'status': 'error',

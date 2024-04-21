@@ -60,7 +60,11 @@ Assistant: Understood! Please provide the list of tweets as a list of strings.""
         nucleus_p=0.95):
         response = response + token.token_str
     prompt = prompt + response + "\n"
+    print("Grok response:", response)
     qualities = response.split(",")
+    if len(qualities) == 1:
+        qualities = qualities[0].split("\n")
+        qualities = [q for q in qualities if q != ""]
     return qualities, prompt
 
 
